@@ -21,12 +21,12 @@ const Portrait = () => {
 
         const selectedRace = appState.find(race => race.selected);
 
-        selectedRace.components.forEach(component => {
+        selectedRace.components.sort((a, b) => a.z - b.z).forEach(component => {
             const imgSrc = `/components/${selectedRace.name}/${component.path}/${selectedRace.name}${component.name}${component.index}.png`;
-            console.log(imgSrc);
+
             let img = new Image();
             img.src = imgSrc;
-            console.log(img);
+
             ctx.drawImage(img, 0, 0);
         })
     }, [ctx, appState])

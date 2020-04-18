@@ -7,7 +7,7 @@ const Container = styled.div`
     display: flex;
 `;
 
-const Tile = styled.div`
+const Tile = styled.button`
     width: 100px;
     height: 100px;
 `;
@@ -23,7 +23,7 @@ const ComponentTab = () => {
     if (selectedRace) {
         return (
             <Container>
-                {selectedRace.components.map(component => 
+                {selectedRace.components.sort((a, b) => a.order - b.order).map(component => 
                     <Tile onClick={() => selectComponentTab(component.name)}>{component.name}</Tile>
                 )}
             </Container>

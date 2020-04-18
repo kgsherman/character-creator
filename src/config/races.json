@@ -6,12 +6,14 @@
             {
                 "name": "Head",
                 "path": "head",
-                "items": 1
+                "items": 1,
+                "z": 0
             },
             {
                 "name": "Eyes",
                 "path": "eyes",
-                "items": 2
+                "items": 2,
+                "z": 1
             }
         ]
     }
