@@ -26,8 +26,7 @@ const Portrait = () => {
 
             let img = new Image();
             img.src = imgSrc;
-
-            ctx.drawImage(img, 0, 0);
+            img.addEventListener('load', () => ctx.drawImage(img, 0, 0), false);            
         })
     }, [ctx, appState])
 
