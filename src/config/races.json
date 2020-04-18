@@ -7,13 +7,29 @@
                 "name": "Head",
                 "path": "head",
                 "items": 1,
-                "z": 0
+                "z": 0,
+                "order": 0
             },
             {
                 "name": "Eyes",
                 "path": "eyes",
                 "items": 2,
-                "z": 1
+                "z": 1,
+                "order": 1
+            },
+            {
+                "name": "Mouth",
+                "path": "mouth",
+                "items": 2,
+                "z": 1,
+                "order": 3
+            },
+            {
+                "name": "Nose",
+                "path": "nose",
+                "items": 2,
+                "z": 1,
+                "order": 2
             }
         ]
     }
