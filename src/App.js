@@ -1,25 +1,24 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Portrait from './Portrait';
+import Selector from './Selector';
+import ComponentTabs from './ComponentTabs';
 
-function App() {
+import { AppProvider } from './context/AppContext';
+
+const App = () => {
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppProvider>
+      <div className="row">
+        <div className="col-xs-12 col-lg-6">
+          <Portrait />
+        </div>
+        <div className="col-xs-12 col-lg-6">
+          {<ComponentTabs />}
+          <Selector />
+        </div>
+      </div>
+    </AppProvider>
   );
 }
 

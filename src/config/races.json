@@ -1,0 +1,19 @@
+[
+    {
+        "name": "Human",
+        "path": "human",
+        "components": [
+            {
+                "name": "Head",
+                "path": "head",
+                "items": 1
+            },
+            {
+                "name": "Eyes",
+                "path": "eyes",
+                "items": 2
+            }
+        ]
+    }
+]
+
