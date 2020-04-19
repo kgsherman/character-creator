@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import { useAppState } from '../context/AppContext';
@@ -12,7 +12,7 @@ const Tile = styled.div`
     height: 100px;
 `;
 
-const Selector = ({ category }) => {
+const Selector = () => {
 
     const { appState, selectComponentIndex } = useAppState();
 
@@ -22,14 +22,15 @@ const Selector = ({ category }) => {
     if (selectedComponent) {
         const race = selectedRace.name;
         const component = selectedComponent.name;
-    
+
         return (
             <Container>
                 {
-                    [...Array(selectedComponent.items)].map((e, i) => 
-                        <Tile onClick={() => selectComponentIndex(i)}>
-                            <img src={`components/${race}/${component}/${race}${component}${i}.png`} height="100" width="100"/>
+                    [...Array(selectedComponent.items)].map((e, i) =>
+                        <Tile onClick={() => selectComponentIndex(i)} key={race + component + i}>
+                            <img src={`components/${race}/${component}/${race}${component}${i}.png`} height="100" width="100" alt={component} />
                         </Tile>
+
                     )
                 }
             </Container>

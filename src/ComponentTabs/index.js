@@ -14,17 +14,19 @@ const Tile = styled.button`
 
 const ComponentTab = () => {
 
-    const { appState, selectComponentTab } = useAppState();
+    const { appState, selectComponentTab, selectComponentTint } = useAppState();
 
     const selectedRace = appState.find(race => race.selected);
-
 
     if (selectedRace) {
         const components = selectedRace.components.sort((a, b) => a.order - b.order);
         return (
             <Container>
-                {components.map(component => 
-                    <Tile key={component.name} onClick={() => selectComponentTab(component.name)}>{component.name}</Tile>
+                {components.map(component =>
+                    <div key={component.name}>
+                        <Tile onClick={() => selectComponentTab(component.name)}>{component.name}</Tile><br/>
+                        {component.tint && <input type="color" onChange={e => selectComponentTint(component.name, e.target.value)} value={component.tint} />}
+                    </div>
                 )}
             </Container>
         );

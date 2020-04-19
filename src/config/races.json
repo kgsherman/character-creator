@@ -16,7 +16,8 @@
                 "path": "eyes",
                 "items": 2,
                 "z": 1,
-                "order": 1
+                "order": 1,
+                "tint": "#ffffff"
             },
             {
                 "name": "Mouth",
@@ -30,7 +31,8 @@
                 "path": "nose",
                 "items": 2,
                 "z": 1,
-                "order": 2
+                "order": 2,
+                "tint": "#e6d0b4"
             }
         ]
     }
