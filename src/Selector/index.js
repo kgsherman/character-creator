@@ -27,7 +27,7 @@ const Selector = () => {
             <Container>
                 {
                     [...Array(selectedComponent.items)].map((e, i) =>
-                        <Tile onClick={() => selectComponentIndex(i)} key={race + component + i}>
+                        <Tile onClick={() => selectComponentIndex(selectedComponent.name, i)} key={race + component + i}>
                             <img src={`components/${race}/${component}/${race}${component}${i}.png`} height="100" width="100" alt={component} />
                         </Tile>
 

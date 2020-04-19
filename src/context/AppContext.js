@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import useAsyncReducer from './useAsyncReducer';
 import races from '../config/races.json';
 
@@ -14,11 +14,75 @@ const initialState = races.map(race => ({
 
 export const AppContext = createContext(initialState);
 
-const reducer = (state, action) => {
+const reducer = async (state, action) => {
   const selectedRace = state.find(race => race.selected);
-  return new Promise(resolve => {
+  return new Promise(async resolve => {
+    const selectedComponent = selectedRace.components.find(component => component.selected);
     switch (action.type) {
-      case 'render':
+      case 'setCanvas':
+        const componentCanvas = document.createElement('canvas');
+        componentCanvas.width = 600;
+        componentCanvas.height = 900;
+        const componentCtx = componentCanvas.getContext('2d');
+      
+        const componentImgSrc = `/components/${selectedRace.name}/${selectedComponent.path}/${selectedRace.name}${selectedComponent.name}${selectedComponent.index}.png`;
+        
+        let componentImg = new Image();
+        componentImg.addEventListener('load', () => {
+      
+          componentCtx.drawImage(componentImg, 0, 0);
+      
+          if (selectedComponent.tint) {
+            const tintSrc = `/components/${selectedRace.name}/${selectedComponent.path}/${selectedRace.name}${selectedComponent.name}${selectedComponent.index}_tint.png`;
+            
+            let tintImg = new Image();
+            tintImg.addEventListener('load', () => {
+              const tintCanvas = document.createElement('canvas');
+              tintCanvas.width = 600;
+              tintCanvas.height = 900;
+              const tintCtx = tintCanvas.getContext('2d');
+              tintCtx.drawImage(tintImg, 0, 0);
+              tintCtx.globalCompositeOperation = 'source-atop';
+              tintCtx.fillStyle = selectedComponent.tint;
+              tintCtx.fillRect(0, 0, 600, 900);
+              tintCtx.globalCompositeOperation = 'source-over';
+      
+              componentCtx.globalCompositeOperation = 'color';
+              componentCtx.drawImage(tintCanvas, 0, 0);
+              componentCtx.globalCompositeOperation = 'source-over';
+              resolve([
+                ...state.filter(race => !race.selected),
+                {
+                  ...selectedRace,
+                  components: [
+                    ...selectedRace.components.filter(component => !component.selected),
+                    {
+                      ...selectedComponent,
+                      canvas: componentCanvas,
+                    }
+                  ]
+                }
+              ]);
+            })
+      
+            tintImg.src = tintSrc;
+          } else {
+            resolve([
+              ...state.filter(race => !race.selected),
+              {
+                ...selectedRace,
+                components: [
+                  ...selectedRace.components.filter(component => !component.selected),
+                  {
+                    ...selectedComponent,
+                    canvas: componentCanvas,
+                  }
+                ]
+              }
+            ]);
+          }
+        });
+        componentImg.src = componentImgSrc;
         break;
       case 'selectRace':
 
@@ -44,76 +108,18 @@ const reducer = (state, action) => {
           ]
         );
         break;
-      case 'selectComponentIndex':
-        const selectedComponent = selectedRace.components.find(component => component.selected);
-
-        const componentCanvas = document.createElement('canvas');
-        componentCanvas.width = 600;
-        componentCanvas.height = 900;
-        const componentCtx = componentCanvas.getContext('2d');
-
-        const componentImgSrc = `/components/${selectedRace.name}/${selectedComponent.path}/${selectedRace.name}${selectedComponent.name}${action.index}.png`;
-        let componentImg = new Image();
-        componentImg.addEventListener('load', () => {
-
-          componentCtx.drawImage(componentImg, 0, 0);
-
-          if (selectedComponent.tint) {
-            const tintSrc = `/components/${selectedRace.name}/${selectedComponent.path}/${selectedRace.name}${selectedComponent.name}${action.index}_tint.png`;
-            let tint = new Image();
-            tint.addEventListener('load', () => {
-              const tintCanvas = document.createElement('canvas');
-              tintCanvas.width = 600;
-              tintCanvas.height = 900;
-              const tintCtx = tintCanvas.getContext('2d');
-              tintCtx.drawImage(tint, 0, 0);
-              tintCtx.globalCompositeOperation = 'source-atop';
-              tintCtx.fillStyle = selectedComponent.tint;
-              tintCtx.fillRect(0, 0, 600, 900);
-              tintCtx.globalCompositeOperation = 'source-over';
-
-              componentCtx.globalCompositeOperation = 'color';
-              componentCtx.drawImage(tintCanvas, 0, 0);
-              componentCtx.globalCompositeOperation = 'source-over';
-
-              resolve([
-                ...state.filter(race => !race.selected),
-                {
-                  ...selectedRace,
-                  components: [
-                    ...selectedRace.components.filter(component => !component.selected),
-                    {
-                      ...selectedComponent,
-                      index: action.index,
-                      canvas: componentCanvas,
-                    }
-                  ]
-                }
-              ]);
-            })
-
-            tint.src = tintSrc;
-          } else {
-
-            resolve([
-              ...state.filter(race => !race.selected),
-              {
-                ...selectedRace,
-                components: [
-                  ...selectedRace.components.filter(component => !component.selected),
-                  {
-                    ...selectedComponent,
-                    index: action.index,
-                    canvas: componentCanvas,
-                  }
-                ]
-              }
-            ])
+      case 'selectComponentIndex':        
+        resolve([
+          ...state.filter(race => !race.selected),
+          {
+            ...selectedRace,
+            components: selectedRace.components.map(component => ({
+              ...component,
+              index: component.name === action.componentName ? action.index : component.index,
+            })),
           }
-
-
-        });
-        componentImg.src = componentImgSrc;
+        ]);
+        
         break;
       case 'selectComponentTint':
         const newState = [
@@ -126,7 +132,6 @@ const reducer = (state, action) => {
             }))
           }
         ]
-        console.log(newState);
         resolve(newState);
         break;
       default:
@@ -143,7 +148,7 @@ export const AppProvider = ({ children }) => {
     dispatch({
       type: 'selectRace',
       raceName,
-    });
+    })
   }
 
   const selectComponentTab = (componentName) => {
@@ -153,10 +158,15 @@ export const AppProvider = ({ children }) => {
     });
   }
 
-  const selectComponentIndex = (index) => {
+  const selectComponentIndex = (componentName, index) => {
     dispatch({
       type: 'selectComponentIndex',
+      componentName,
       index,
+    });
+
+    dispatch({
+      type: 'setCanvas',
     });
   }
 
@@ -165,9 +175,12 @@ export const AppProvider = ({ children }) => {
       type: 'selectComponentTint',
       componentName,
       tint,
-    })
-  }
+    });
 
+    dispatch({
+      type: 'setCanvas',
+    });
+  }
 
   return <AppContext.Provider value={{ selectRace, selectComponentTab, selectComponentIndex, selectComponentTint, appState }}>{children}</AppContext.Provider>;
 };
