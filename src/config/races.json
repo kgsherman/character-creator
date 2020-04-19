@@ -20,20 +20,20 @@
                 "tint": "#409991"
             },
             {
-                "name": "Mouth",
-                "path": "mouth",
-                "items": 2,
-                "z": 1,
-                "order": 3,
-                "tint": "#d69a9a"
-            },
-            {
                 "name": "Nose",
                 "path": "nose",
                 "items": 3,
                 "z": 1,
                 "order": 2,
                 "tint": "#edd6c0"
+            },
+            {
+                "name": "Mouth",
+                "path": "mouth",
+                "items": 1,
+                "z": 1,
+                "order": 3,
+                "tint": "#d69a9a"
             }
         ]
     }
