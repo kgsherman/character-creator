@@ -19,9 +19,6 @@ const reducer = async (state, action) => {
   const selectedRace = state.find(race => race.selected);
   return new Promise(async resolve => {
     switch (action.type) {
-      case 'setCanvas':
-        jank(resolve, state)
-        break;
       case 'selectRace':
 
         resolve(
@@ -46,7 +43,7 @@ const reducer = async (state, action) => {
           ]
         );
         break;
-      case 'selectComponentIndex':        
+      case 'selectComponentIndex':
         const newState1 = [
           ...state.filter(race => !race.selected),
           {
@@ -57,8 +54,8 @@ const reducer = async (state, action) => {
             })),
           }
         ];
-        jank(resolve,  newState1)
-        
+        jank(resolve, newState1, action.componentName)
+
         break;
       case 'selectComponentTint':
         const newState2 = [
@@ -71,7 +68,7 @@ const reducer = async (state, action) => {
             }))
           }
         ]
-        jank(resolve,  newState2)
+        jank(resolve, newState2, action.componentName)
         break;
       default:
         resolve(state);

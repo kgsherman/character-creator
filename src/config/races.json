@@ -9,7 +9,7 @@
                 "items": 1,
                 "z": 0,
                 "order": 0,
-                "tint": "#e6d0b4"
+                "tint": "#a5786b"
             },
             {
                 "name": "Eyes",
@@ -17,7 +17,7 @@
                 "items": 2,
                 "z": 1,
                 "order": 1,
-                "tint": "#ffffff"
+                "tint": "#409991"
             },
             {
                 "name": "Mouth",
@@ -32,7 +32,7 @@
                 "items": 2,
                 "z": 1,
                 "order": 2,
-                "tint": "#e6d0b4"
+                "tint": "#a5786b"
             }
         ]
     }
