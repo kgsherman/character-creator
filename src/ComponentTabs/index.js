@@ -25,7 +25,7 @@ const ComponentTab = () => {
                 {components.map(component =>
                     <div key={component.name}>
                         <Tile onClick={() => selectComponentTab(component.name)}>{component.name}</Tile><br/>
-                        {component.tint && <input type="color" onChange={e => selectComponentTint(component.name, e.target.value)}  />}
+                        {component.tint && <input type="color" onChange={e => selectComponentTint(component.name, e.target.value)} value={component.tint} />}
                     </div>
                 )}
             </Container>
