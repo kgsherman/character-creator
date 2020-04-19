@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import useAsyncReducer from './useAsyncReducer';
 import races from '../config/races.json';
+import jank from './jank';
 
 const initialState = races.map(race => ({
   ...race,
@@ -17,72 +18,9 @@ export const AppContext = createContext(initialState);
 const reducer = async (state, action) => {
   const selectedRace = state.find(race => race.selected);
   return new Promise(async resolve => {
-    const selectedComponent = selectedRace.components.find(component => component.selected);
     switch (action.type) {
       case 'setCanvas':
-        const componentCanvas = document.createElement('canvas');
-        componentCanvas.width = 600;
-        componentCanvas.height = 900;
-        const componentCtx = componentCanvas.getContext('2d');
-      
-        const componentImgSrc = `/components/${selectedRace.name}/${selectedComponent.path}/${selectedRace.name}${selectedComponent.name}${selectedComponent.index}.png`;
-        
-        let componentImg = new Image();
-        componentImg.addEventListener('load', () => {
-      
-          componentCtx.drawImage(componentImg, 0, 0);
-      
-          if (selectedComponent.tint) {
-            const tintSrc = `/components/${selectedRace.name}/${selectedComponent.path}/${selectedRace.name}${selectedComponent.name}${selectedComponent.index}_tint.png`;
-            
-            let tintImg = new Image();
-            tintImg.addEventListener('load', () => {
-              const tintCanvas = document.createElement('canvas');
-              tintCanvas.width = 600;
-              tintCanvas.height = 900;
-              const tintCtx = tintCanvas.getContext('2d');
-              tintCtx.drawImage(tintImg, 0, 0);
-              tintCtx.globalCompositeOperation = 'source-atop';
-              tintCtx.fillStyle = selectedComponent.tint;
-              tintCtx.fillRect(0, 0, 600, 900);
-              tintCtx.globalCompositeOperation = 'source-over';
-      
-              componentCtx.globalCompositeOperation = 'color';
-              componentCtx.drawImage(tintCanvas, 0, 0);
-              componentCtx.globalCompositeOperation = 'source-over';
-              resolve([
-                ...state.filter(race => !race.selected),
-                {
-                  ...selectedRace,
-                  components: [
-                    ...selectedRace.components.filter(component => !component.selected),
-                    {
-                      ...selectedComponent,
-                      canvas: componentCanvas,
-                    }
-                  ]
-                }
-              ]);
-            })
-      
-            tintImg.src = tintSrc;
-          } else {
-            resolve([
-              ...state.filter(race => !race.selected),
-              {
-                ...selectedRace,
-                components: [
-                  ...selectedRace.components.filter(component => !component.selected),
-                  {
-                    ...selectedComponent,
-                    canvas: componentCanvas,
-                  }
-                ]
-              }
-            ]);
-          }
-        });
-        componentImg.src = componentImgSrc;
+        jank(resolve, state)
         break;
       case 'selectRace':
 
@@ -109,7 +47,7 @@ const reducer = async (state, action) => {
         );
         break;
       case 'selectComponentIndex':        
-        resolve([
+        const newState1 = [
           ...state.filter(race => !race.selected),
           {
             ...selectedRace,
@@ -118,11 +56,12 @@ const reducer = async (state, action) => {
               index: component.name === action.componentName ? action.index : component.index,
             })),
           }
-        ]);
+        ];
+        jank(resolve,  newState1)
         
         break;
       case 'selectComponentTint':
-        const newState = [
+        const newState2 = [
           ...state.filter(race => !race.selected),
           {
             ...selectedRace,
@@ -132,7 +71,7 @@ const reducer = async (state, action) => {
             }))
           }
         ]
-        resolve(newState);
+        jank(resolve,  newState2)
         break;
       default:
         resolve(state);
@@ -164,10 +103,6 @@ export const AppProvider = ({ children }) => {
       componentName,
       index,
     });
-
-    dispatch({
-      type: 'setCanvas',
-    });
   }
 
   const selectComponentTint = (componentName, tint) => {
@@ -175,10 +110,6 @@ export const AppProvider = ({ children }) => {
       type: 'selectComponentTint',
       componentName,
       tint,
-    });
-
-    dispatch({
-      type: 'setCanvas',
     });
   }
 
