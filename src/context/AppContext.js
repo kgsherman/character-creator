@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext } from 'react';
+import useAsyncReducer from './useAsyncReducer';
 import races from '../config/races.json';
 
 const initialState = races.map(race => ({
@@ -15,49 +16,112 @@ export const AppContext = createContext(initialState);
 
 const reducer = (state, action) => {
   const selectedRace = state.find(race => race.selected);
-  console.log('selectedRace', selectedRace)
-  switch (action.type) {
-    case 'selectRace':
-      
-      return state.map(race => ({
-        ...race,
-        selected: race.name === action.raceName,
-      }));
-    case 'selectComponentTab':
-      
-      return [
-        ...state.filter(race => !race.selected),
-        {
-          ...selectedRace,
-          components: selectedRace.components.map(component => ({
-            ...component,
-            selected: component.name === action.componentName,
+  return new Promise(resolve => {
+    switch (action.type) {
+      case 'selectRace':
+        
+        resolve(
+          state.map(race => ({
+            ...race,
+            selected: race.name === action.raceName,
           }))
-        }
-      ]
-    case 'selectComponentIndex':
-      const selectedComponent = selectedRace.components.find(component => component.selected);
-      return [
-        ...state.filter(race => !race.selected),
-        {
-          ...selectedRace,
-          components: [
-            ...selectedRace.components.filter(component => !component.selected),
+        );
+        break;
+      case 'selectComponentTab':
+        
+        resolve(
+          [
+            ...state.filter(race => !race.selected),
             {
-              ...selectedComponent,
-              index: action.index,
+              ...selectedRace,
+              components: selectedRace.components.map(component => ({
+                ...component,
+                selected: component.name === action.componentName,
+              }))
             }
           ]
-        }
-      ]
-    default:
-      return state;
-  }
+        );
+        break;
+      case 'selectComponentIndex':
+        const selectedComponent = selectedRace.components.find(component => component.selected);
+        
+        const componentCanvas = document.createElement('canvas');
+        componentCanvas.width = 600;
+        componentCanvas.height = 900;
+        const componentCtx = componentCanvas.getContext('2d');
+  
+        const componentImgSrc = `/components/${selectedRace.name}/${selectedComponent.path}/${selectedRace.name}${selectedComponent.name}${action.index}.png`;
+        let componentImg = new Image();
+        componentImg.addEventListener('load', () => {
+  
+            componentCtx.drawImage(componentImg, 0, 0);
+  
+            if (selectedComponent.tint) {
+                const tintSrc = `/components/${selectedRace.name}/${selectedComponent.path}/${selectedRace.name}${selectedComponent.name}${action.index}_tint.png`;
+                let tint = new Image();
+                tint.addEventListener('load', () => {
+                    const tintCanvas = document.createElement('canvas');
+                    tintCanvas.width = 600;
+                    tintCanvas.height = 900;
+                    const tintCtx = tintCanvas.getContext('2d');
+                    tintCtx.drawImage(tint, 0, 0);
+                    tintCtx.globalCompositeOperation = 'source-atop';
+                    tintCtx.fillStyle = selectedComponent.tint;
+                    tintCtx.fillRect(0, 0, 600, 900);
+                    tintCtx.globalCompositeOperation = 'source-over';
+  
+                    componentCtx.globalCompositeOperation = 'color';
+                    componentCtx.drawImage(tintCanvas, 0, 0);
+                    componentCtx.globalCompositeOperation = 'source-over';
+
+                    resolve([
+                      ...state.filter(race => !race.selected),
+                      {
+                        ...selectedRace,
+                        components: [
+                          ...selectedRace.components.filter(component => !component.selected),
+                          {
+                            ...selectedComponent,
+                            index: action.index,
+                            canvas: componentCanvas,
+                          }
+                        ]
+                      }
+                    ]);
+                })
+  
+                tint.src = tintSrc;
+            } else {
+              
+              resolve([
+                ...state.filter(race => !race.selected),
+                {
+                  ...selectedRace,
+                  components: [
+                    ...selectedRace.components.filter(component => !component.selected),
+                    {
+                      ...selectedComponent,
+                      index: action.index,
+                      canvas: componentCanvas,
+                    }
+                  ]
+                }
+              ])
+            }
+  
+            
+        });
+        componentImg.src = componentImgSrc;
+        break;
+      default:
+        resolve(state);
+    }
+  })
 };
 
 export const AppProvider = ({ children }) => {
 
-  const [appState, dispatch] = useReducer(reducer, initialState);
+  const [appState, dispatch] = useAsyncReducer(reducer, initialState);
 
   const selectRace = (raceName) => {
     dispatch({

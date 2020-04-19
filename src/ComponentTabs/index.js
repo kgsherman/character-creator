@@ -18,15 +18,13 @@ const ComponentTab = () => {
 
     const selectedRace = appState.find(race => race.selected);
 
-    console.log({...appState})
 
     if (selectedRace) {
         const components = selectedRace.components.sort((a, b) => a.order - b.order);
-        console.log('components', components.map(c => c.name))
         return (
             <Container>
                 {components.map(component => 
-                    <Tile onClick={() => selectComponentTab(component.name)}>{component.name}</Tile>
+                    <Tile key={component.name} onClick={() => selectComponentTab(component.name)}>{component.name}</Tile>
                 )}
             </Container>
         );
