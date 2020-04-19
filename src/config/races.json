@@ -24,15 +24,16 @@
                 "path": "mouth",
                 "items": 2,
                 "z": 1,
-                "order": 3
+                "order": 3,
+                "tint": "#d69a9a"
             },
             {
                 "name": "Nose",
                 "path": "nose",
-                "items": 2,
+                "items": 3,
                 "z": 1,
                 "order": 2,
-                "tint": "#a5786b"
+                "tint": "#edd6c0"
             }
         ]
     }

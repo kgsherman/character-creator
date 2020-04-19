@@ -28,8 +28,9 @@ export default (resolve, state, componentName) => {
                 tintCtx.fillRect(0, 0, 600, 900);
                 tintCtx.globalCompositeOperation = 'source-over';
 
-                componentCtx.globalCompositeOperation = 'hard-light';
                 componentCtx.drawImage(tintCanvas, 0, 0);
+                componentCtx.globalCompositeOperation = 'hard-light';
+                componentCtx.drawImage(componentImg, 0, 0);
                 componentCtx.globalCompositeOperation = 'source-over';
                 resolve([
                     ...state.filter(race => !race.selected),
@@ -48,6 +49,7 @@ export default (resolve, state, componentName) => {
 
             tintImg.src = tintSrc;
         } else {
+            componentCtx.drawImage(componentImg, 0, 0);
             resolve([
                 ...state.filter(race => !race.selected),
                 {
